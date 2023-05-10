@@ -1,0 +1,15 @@
+api-key: 91d4dd90606749168ee80594338285e2
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+feign:
+  client:
+    config.news-api:
+      connectTimeout: 5000
+      readTimeout: 5000
+server:
+  port: 8090
+  servlet:
+    context-path: /
