@@ -11,10 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -107,12 +110,24 @@ public class NewsControllerTest {
         mockedNewsList.add(new NewsArticle(source, "Lawrence Bonk3", "Money transfer firm Wise shares drop as volumes disappoint", "Money transfer firm Wise shares drop as volumes disappoint", "https://consent.google.com/ml?continue=https://news.google.com/rss/articles/CBMiZGh0dHBzOi8vd3d3LnJldXRlcnMuY29tL2J1c2luZXNzL21vbmV5LXRyYW5zZmVyLWZpcm0td2lzZS1zaGFyZXMtZHJvcC12b2x1bWVzLWRpc2FwcG9pbnQtMjAyMy0wNC0xOC_SAQA?oc%3D5&gl=FR&hl=en-US&cm=2&pc=n&src=1", null, "2023-04-18T08:44:00Z", "Reuters"));
         mockedNewsList.add(new NewsArticle(source, "Lawrence Bonk4", "Money transfer firm Wise shares drop as volumes disappoint", "Money transfer firm Wise shares drop as volumes disappoint", "https://consent.google.com/ml?continue=https://news.google.com/rss/articles/CBMiZGh0dHBzOi8vd3d3LnJldXRlcnMuY29tL2J1c2luZXNzL21vbmV5LXRyYW5zZmVyLWZpcm0td2lzZS1zaGFyZXMtZHJvcC12b2x1bWVzLWRpc2FwcG9pbnQtMjAyMy0wNC0xOC_SAQA?oc%3D5&gl=FR&hl=en-US&cm=2&pc=n&src=1", null, "2023-04-18T08:44:00Z", "Reuters"));
 
-        // Mock the behavior of the newsService
-        when(newsService.searchArticles(new SearchInput())).thenReturn(mockedNewsList);
-        mvc.perform(post("/api/news/search").contentType(MediaType.APPLICATION_JSON).content("{\"query\":\"money transfer\",\"fromDate\":\"2023-04-10\",\"sortBy\":\"author\"}")).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(mockedNewsList.size())).andExpect(jsonPath("$[0].title").value(mockedNewsList.get(0).getTitle())).andExpect(jsonPath("$[0].description").value(mockedNewsList.get(0).getDescription())).andExpect(jsonPath("$[0].author").value(mockedNewsList.get(0).getAuthor()))
-                // Add assertions for other fields as needed
-                .andExpect(jsonPath("$[1].title").value(mockedNewsList.get(1).getTitle())).andExpect(jsonPath("$[1].description").value(mockedNewsList.get(1).getDescription())).andExpect(jsonPath("$[1].author").value(mockedNewsList.get(1).getAuthor()));
+        SearchInput input = new SearchInput();
+        input.setQuery("money transfer");
+        input.setFromDate(LocalDate.parse("2023-04-10"));
+        input.setSortBy("author");
 
+        // Mock the behavior of the newsService
+
+        when(newsService.searchArticles(input)).thenReturn(mockedNewsList);
+        mvc.perform(post("/api/news/search")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"query\":\"money transfer\",\"fromDate\":\"2023-04-10\",\"sortBy\":\"author\"}"))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.length()").value(mockedNewsList.size()))
+                        .andExpect(jsonPath("$[0].title").value(mockedNewsList.get(0).getTitle()))
+                        .andExpect(jsonPath("$[0].description").value(mockedNewsList.get(0).getDescription()))
+                        .andExpect(jsonPath("$[0].author").value(mockedNewsList.get(0).getAuthor()))
+                        .andExpect(jsonPath("$[1].title").value(mockedNewsList.get(1).getTitle()))
+                        .andExpect(jsonPath("$[1].description").value(mockedNewsList.get(1).getDescription()))
+                        .andExpect(jsonPath("$[1].author").value(mockedNewsList.get(1).getAuthor()));
     }
 }
-
